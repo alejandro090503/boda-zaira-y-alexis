@@ -937,52 +937,17 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
 
 #envelope-screen{
   position:fixed;inset:0;z-index:9998;
-  background:
-    radial-gradient(ellipse at center top, #9A4824 0%, transparent 60%),
-    linear-gradient(160deg, #6E2E16 0%, #2A1A11 100%);
+  background:#2A1A11;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;overflow:hidden;
 }
-.env-card{
-  position:relative;z-index:2;
-  display:flex;flex-direction:column;align-items:center;
-  padding:clamp(40px,7vw,64px) clamp(28px,6vw,52px);
-  text-align:center;
+#env-image,#env-video{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;object-position:center;
 }
-.env-frame{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);z-index:-1}
-.env-eyebrow{
-  font-family:var(--sans);font-weight:500;
-  font-size:11px;letter-spacing:.5em;text-transform:uppercase;
-  color:var(--gold-soft);padding-left:.5em;margin-bottom:clamp(32px,6vw,48px);
-}
-.env-seal{
-  width:clamp(120px,26vw,156px);height:clamp(120px,26vw,156px);
-  border-radius:50%;
-  background:radial-gradient(circle at 38% 32%, #9A4824 0%, #6E2E16 55%, #22100A 100%);
-  border:2px solid var(--gold);
-  box-shadow:0 12px 40px -12px rgba(0,0,0,.6),inset 0 2px 14px rgba(230,198,140,.25);
-  display:flex;align-items:center;justify-content:center;
-  position:relative;margin-bottom:clamp(32px,6vw,44px);
-}
-.env-seal::after{
-  content:"";position:absolute;inset:9px;border-radius:50%;
-  border:1px solid rgba(230,198,140,.4);
-}
-.env-seal-mono{
-  font-family:var(--script);font-size:clamp(44px,10vw,60px);
-  color:var(--gold-soft);line-height:1;
-}
-.env-seal-mono span{font-size:.5em;color:var(--gold);padding:0 .04em;vertical-align:middle}
-.env-names{
-  font-family:var(--display);font-style:italic;font-weight:400;
-  font-size:clamp(34px,8vw,50px);color:#F8F5EC;line-height:1.1;margin-bottom:18px;
-}
-.env-names span{font-family:var(--script);color:var(--gold-soft);font-size:.8em}
-.env-date{
-  font-family:var(--italiana);font-size:clamp(13px,3.4vw,16px);
-  letter-spacing:.32em;text-transform:uppercase;
-  color:rgba(248,245,236,.82);padding-left:.32em;
-}
+#env-image{opacity:0;z-index:1}
+#env-video{opacity:0;z-index:2;pointer-events:none}
 #env-hint{
   position:absolute;bottom:min(9vh,80px);left:50%;transform:translateX(-50%);
   font-family:var(--sans);font-size:14px;font-weight:500;
@@ -1065,18 +1030,10 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
 
 <!-- ENVELOPE OPENING SEQUENCE -->
 <div id="envelope-screen" role="button" aria-label="Toca para abrir la invitación" tabindex="0">
-  <div class="env-card">
-    <svg class="env-frame" viewBox="0 0 320 460" preserveAspectRatio="none" aria-hidden="true">
-      <rect x="14" y="14" width="292" height="432" fill="none" stroke="rgba(230,198,140,.5)" stroke-width="1"/>
-      <rect x="22" y="22" width="276" height="416" fill="none" stroke="rgba(230,198,140,.28)" stroke-width="1"/>
-    </svg>
-    <div class="env-eyebrow">Tienes una invitación</div>
-    <div class="env-seal" aria-hidden="true">
-      <span class="env-seal-mono">Z<span>&amp;</span>A</span>
-    </div>
-    <div class="env-names">Zaira <span>&amp;</span> Alexis</div>
-    <div class="env-date">17 · Octubre · 2026</div>
-  </div>
+  <img id="env-image" src="envelope.jpg" alt="Sobre de invitación de Zaira y Alexis">
+  <video id="env-video" muted playsinline preload="auto">
+    <source src="envelope.mp4" type="video/mp4">
+  </video>
   <div id="env-hint">Toca para abrir</div>
 </div>
 <div id="env-flash" aria-hidden="true"></div>
@@ -1687,19 +1644,22 @@ function launchInvitation(){
   if(window.ScrollTrigger) ScrollTrigger.refresh();
 }
 
-// ------ ENVELOPE OPENING SEQUENCE ------
+// ------ ENVELOPE OPENING SEQUENCE (imagen → video → revelado) ------
 (function(){
   const envScreen = document.getElementById('envelope-screen');
-  const envCard   = envScreen ? envScreen.querySelector('.env-card') : null;
+  const envImage  = document.getElementById('env-image');
+  const envVideo  = document.getElementById('env-video');
   const envHint   = document.getElementById('env-hint');
   const envFlash  = document.getElementById('env-flash');
   const wrap      = document.querySelector('.wrap');
-  if(!envScreen || !envCard || !envFlash || !wrap) return;
+  if(!envScreen || !envImage || !envVideo || !envFlash || !wrap) return;
 
-  // Entrada suave del sello
-  gsap.fromTo(envCard,{opacity:0,y:16,scale:.96},{opacity:1,y:0,scale:1,duration:1.1,ease:'power2.out',delay:.2});
+  let opened  = false;
+  let flashed = false;
 
-  let opened = false;
+  // Fade-in suave de la imagen del sobre
+  gsap.fromTo(envImage,{opacity:0},{opacity:1,duration:1,ease:'power2.out',delay:.2});
+
   function openEnvelope(){
     if(opened) return;
     opened = true;
@@ -1708,15 +1668,37 @@ function launchInvitation(){
     if(window.startMusic) window.startMusic();
 
     gsap.to(envHint,{opacity:0,duration:.35,ease:'power2.out'});
-    gsap.to(envCard,{opacity:0,y:-12,scale:1.04,duration:.7,ease:'power2.inOut'});
 
+    // Crossfade imagen → video (primer frame idéntico = sin salto)
+    const p = envVideo.play();
+    if(p && typeof p.catch === 'function') p.catch(()=>{});
+    gsap.to(envImage,{opacity:0,duration:.6,ease:'power2.inOut',
+      onComplete:()=>{envImage.style.display='none'}});
+    gsap.to(envVideo,{opacity:1,duration:.6,ease:'power2.inOut'});
+
+    // El video termina en blanco → revelar la invitación cerca del final
+    envVideo.addEventListener('timeupdate', onTimeUpdate);
+    envVideo.addEventListener('ended', triggerReveal);
+  }
+
+  function onTimeUpdate(){
+    if(flashed) return;
+    const dur = envVideo.duration;
+    if(!isFinite(dur) || dur <= 0) return;
+    if(envVideo.currentTime >= dur - 0.5) triggerReveal();
+  }
+
+  function triggerReveal(){
+    if(flashed) return;
+    flashed = true;
+    // El propio video ya está en blanco; un flash breve cierra la transición
     gsap.to(envFlash,{
-      opacity:1, duration:.9, ease:'power2.inOut', delay:.2,
+      opacity:1, duration:.5, ease:'power2.inOut',
       onComplete: ()=>{
         envScreen.style.display = 'none';
         wrap.style.visibility = 'visible';
         launchInvitation();
-        gsap.to(envFlash,{opacity:0,duration:1.2,ease:'power2.inOut',delay:.1,
+        gsap.to(envFlash,{opacity:0,duration:1.1,ease:'power2.inOut',delay:.1,
           onComplete:()=>{envFlash.style.display='none'}});
       }
     });
