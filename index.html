@@ -788,7 +788,7 @@ function scrollAnims() {
     if (els.length) gsap.from(els, { opacity:0, y:22, duration:.7, stagger:.1, ease, scrollTrigger:{ trigger:sec, start:'top 88%', once:true } });
   });
   gsap.from('.cd-box', { opacity:0, y:28, scale:.88, duration:.65, stagger:.09, ease:'back.out(1.5)', scrollTrigger:{ trigger:'#countdown', start:'top 85%', once:true } });
-  gsap.from('.loc-card', { opacity:0, y:36, duration:.75, stagger:.14, ease, scrollTrigger:{ trigger:'#location', start:'top 78%', once:true } });
+  gsap.from('#location .loc-card', { opacity:0, y:36, duration:.75, stagger:.14, ease, scrollTrigger:{ trigger:'#location', start:'top 78%', once:true } });
   gsap.from(['#calendar .cal-sub','#calBtn'], { opacity:0, y:18, scale:.96, duration:.65, stagger:.14, ease:'back.out(1.3)', scrollTrigger:{ trigger:'#calendar', start:'top 84%', once:true } });
 
   ScrollTrigger.create({ trigger:'#itinerary', start:'top 72%', once:true, onEnter(){
