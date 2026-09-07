@@ -631,7 +631,7 @@ section{padding:64px 22px}
   <span class="lbl">Confirmación de asistencia</span>
   <h2 class="ttl">¿Nos acompañas?</h2>
   <div class="gline"></div>
-  <p class="rsvp-sub">Confirma antes del<br><span class="rsvp-dl">5 de Septiembre de 2026</span></p>
+  <p class="rsvp-sub">Confirma antes del<br><span class="rsvp-dl">2 de Octubre de 2026</span></p>
 
   <div class="rsvp-std">
     <p id="rsvp-pases-note" style="display:none"></p>
@@ -911,7 +911,7 @@ document.querySelectorAll('input[name="att"]').forEach(r => {
 (function(){
   const PANEL_API = 'https://panel-invitados.vercel.app/api/confirmar';
   const RSVP_URL  = 'https://boda-zaira-y-alexis.vercel.app';
-  const DEADLINE  = new Date(2026, 8, 5, 23, 59, 59, 999);
+  const DEADLINE  = new Date(2026, 9, 2, 23, 59, 59, 999);   /* 2 oct 2026 */
   const frozen    = Date.now() > DEADLINE.getTime();
   const params    = new URLSearchParams(window.location.search);
   const urlPara   = (params.get('para')  || '').trim();
