@@ -1,1 +1,1 @@
-{"rewrites":[{"source":"/(.*)","destination":"/index.html"}]}
+{"redirects":[{"source":"/album","destination":"https://panel-invitados.vercel.app/subir/zaira-y-alexis","permanent":false}],"rewrites":[{"source":"/(.*)","destination":"/index.html"}]}
